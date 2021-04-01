@@ -1,0 +1,8 @@
+{
+  "movie_id": "1",
+  "title": "myMovie",
+  "score": "10",
+  "release_date": "2021-03-31",
+  "genres": "Drama",
+  "description": "This is testing"
+}

@@ -15,11 +15,19 @@ def register():
         return jsonify({"error": "The input is not valid."}), 404
     elif User.query.filter_by(username=username).first():
         return jsonify({"error": "The username already exists."}), 404
-    new_user = User()
-    new_user.set_attr(request.json)
-    db.session.add(new_user)
-    db.session.commit()
-    return jsonify({"message": "Successfully created a new user {}.".format(username)}), 201
+    policy = PasswordPolicy()
+    if policy.validate(password):      
+        new_user = User()
+        new_user.set_attr(request.json)
+        db.session.add(new_user)
+        db.session.commit()
+        return jsonify({"message": "Successfully created a new user {}.".format(username)}), 201
+    else:
+        invalid_items = dict()
+        invalid_items['message'] = "The input password is not valid."
+        for item in policy.test_password(password):
+            invalid_items[item.name] = item.requirement
+        return invalid_items, 202       
 
 
 @cloudapp.route("/user", methods=['GET'])
@@ -33,7 +41,7 @@ def get_user():
         return jsonify({"message": "You are unauthorized to do the operation."}), 401
 
 
-@cloudapp.route("/user/authInfo", methods=['POST'])
+@cloudapp.route("/user/authInfo", methods=['PUT'])
 @login_required
 def modify_password():
     # update the user password

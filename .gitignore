@@ -1,2 +1,4 @@
 .cloudEnv
 .idea
+.DS_Store
+movies_api_cache.sqlite
